@@ -15,11 +15,9 @@ export const getCurrentUser = async () => {
 }
 
 export const getProject = async (id: string): Promise<DesignItem | null> => {
-    try {
-        return (await puter.kv.get(`project_${id}`)) as DesignItem | null;
-    } catch {
-        return null;
-    }
+    const value = await puter.kv.get(`project_${id}`);
+    if (!value) return null;
+    return value as DesignItem;
 }
 
 export const createProject = async ({ item }: CreateProjectParams): Promise<DesignItem | null | undefined> => {

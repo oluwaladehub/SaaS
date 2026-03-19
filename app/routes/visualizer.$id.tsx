@@ -43,6 +43,11 @@ const VisualizerId = () => {
 
     useEffect(() => {
         const loadProject = async () => {
+            setError(null);
+            setCurrentImage(null);
+            setProjectName('Untitled Project');
+            hasInitialGenerated.current = false;
+
             if (stateInitialImage) {
                 setInitialImage(stateInitialImage);
                 setInitialRender(stateInitialRender);
