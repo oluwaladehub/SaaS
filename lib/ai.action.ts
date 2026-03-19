@@ -1,5 +1,6 @@
 import puter from "@heyputer/puter.js";
 import {ROOMIFY_RENDER_PROMPT} from "./constants";
+export {getProject} from "./puter.action";
 
 export async function fetchAsDataUrl(url: string): Promise<string> {
   const response = await fetch(url);
@@ -36,7 +37,6 @@ export const generate3DView = async ({ sourceImage } : Generate3DViewParams) => 
     provider: 'gemini',
     model: 'gemini-2.5-flash-image-preview',
     input_image: base64Data,
-    input_image_mime_type: mimeType,
     ratio: { w: 1024, h: 1024 }
   });
 

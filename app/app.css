@@ -371,6 +371,10 @@
             }
           }
         }
+
+        .error-banner {
+          @apply absolute top-4 left-4 right-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-center text-red-800 text-sm z-40 shadow-sm duration-300;
+        }
       }
 
       &.compare {
