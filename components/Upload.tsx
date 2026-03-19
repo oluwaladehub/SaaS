@@ -70,9 +70,21 @@ const Upload = ({ onComplete }: UploadProps) => {
                             clearInterval(intervalRef.current);
                             intervalRef.current = null;
                         }
-                        timeoutRef.current = setTimeout(() => {
-                            if (onComplete) onComplete(base64Data);
-                            timeoutRef.current = null;
+                        timeoutRef.current = setTimeout(async () => {
+                            try {
+                                if (onComplete) {
+                                    const result = await onComplete(base64Data);
+                                    if (result === false) {
+                                        throw new Error("Failed to save project");
+                                    }
+                                }
+                            } catch (err) {
+                                setFile(null);
+                                setProgress(0);
+                                setError(err instanceof Error ? err.message : "Failed to complete upload");
+                            } finally {
+                                timeoutRef.current = null;
+                            }
                         }, REDIRECT_DELAY_MS);
                         return 100;
                     }

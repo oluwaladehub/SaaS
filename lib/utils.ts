@@ -1,8 +1,18 @@
 export const HOSTING_CONFIG_KEY = "roomify_hosting_config";
 export const HOSTING_DOMAIN_SUFFIX = ".puter.site";
 
-export const isHostedUrl = (value: unknown): value is string =>
-    typeof value === "string" && value.includes(HOSTING_DOMAIN_SUFFIX);
+export const isHostedUrl = (value: unknown): value is string => {
+    if (typeof value !== "string") return false;
+    try {
+        const url = new URL(value);
+        return (
+            url.hostname === HOSTING_DOMAIN_SUFFIX.replace(/^\./, "") ||
+            url.hostname.endsWith(HOSTING_DOMAIN_SUFFIX)
+        );
+    } catch {
+        return false;
+    }
+};
 
 export const createHostingSlug = () =>
     `roomify-${Date.now().toString(36)}-${Math.random()
@@ -76,15 +86,22 @@ export const fetchBlobFromUrl = async (
         return dataUrlToBlob(url);
     }
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, { signal: controller.signal });
         if (!response.ok) throw new Error("Failed to fetch image");
-        return {
-            blob: await response.blob(),
-            contentType: response.headers.get("content-type") || "",
-        };
-    } catch {
+        const blob = await response.blob();
+        const contentType = response.headers.get("content-type") || "";
+        return { blob, contentType };
+    } catch (e) {
+        if (e instanceof Error && e.name === 'AbortError') {
+            console.warn("Fetch timed out");
+        }
         return null;
+    } finally {
+        clearTimeout(timeout);
     }
 };
 
